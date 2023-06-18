@@ -86,8 +86,8 @@ namespace DataProj.Services.Services.Implementations
                 {
                     query = sortOrder switch
                     {
-                        Sort.NameDesc => query.OrderByDescending(p => p.ProjectName),
-                        Sort.NameAsc => query.OrderBy(p => p.ProjectName),
+                        Sort.NameDesc => query.OrderByDescending(p => p.Name),
+                        Sort.NameAsc => query.OrderBy(p => p.Name),
                         Sort.PriorityDesc => query.OrderByDescending(p => p.Priority),
                         Sort.PriorityAsc => query.OrderBy(p => p.Priority),
                         _ => query,

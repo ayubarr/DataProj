@@ -14,7 +14,7 @@ namespace DataProj.Services.Helpers
             if (projectFilterDto is null) return filter;
 
             if (projectFilterDto.ShouldFilterByName())
-                filter = filter.And(x => x.ProjectName.Contains(projectFilterDto.Name));
+                filter = filter.And(x => x.Name.Contains(projectFilterDto.Name));
 
             if (projectFilterDto.StartDate.HasValue)
                 filter = filter.And(x => x.StartDate >= projectFilterDto.StartDate);

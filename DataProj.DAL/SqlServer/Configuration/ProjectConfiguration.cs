@@ -11,7 +11,7 @@ namespace DataProj.DAL.SqlServer.Configuration
 
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.ProjectName).HasMaxLength(50);
+            builder.Property(x => x.Name).HasMaxLength(50);
 
             builder.Property(x => x.ExecutiveCompanyName).HasMaxLength(50);
             builder.Property(x => x.ClientCompanyName).HasMaxLength(50);
