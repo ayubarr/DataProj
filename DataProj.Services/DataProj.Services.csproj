@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="LinqKit" Version="1.2.4" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.21.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataProj.DAL\DataProj.DAL.csproj" />
+    <ProjectReference Include="..\DataProj.Domain\DataProj.Domain.csproj" />
+    <ProjectReference Include="..\DataProj.ValidationHelper\DataProj.ValidationHelper.csproj" />
+    <ProjectReference Include="..\FinalProj.ApiModels\FinalProj.ApiModels.csproj" />
+  </ItemGroup>
+
+</Project>
