@@ -59,7 +59,7 @@ namespace DataProj.Services.Services.Interfaces
         /// <param name="employeeId">The ID of the employee to assign.</param>
         /// <param name="projectId">The ID of the project to assign.</param>
         /// <returns>A task representing the asynchronous operation. The task result contains the response indicating the success or failure of the operation.</returns>
-        Task<IBaseResponse<bool>> AssignEmployeeToProjectAsync(string employeeId, Guid projectId);
+        Task<IBaseResponse<bool>> AssignEmployeeToProjectAsync(List<string> employeeId, Guid projectId);
 
         /// <summary>
         /// Removes an employee from a project.
@@ -67,7 +67,7 @@ namespace DataProj.Services.Services.Interfaces
         /// <param name="employeeId">The ID of the employee to remove.</param>
         /// <param name="projectId">The ID of the project to remove the employee from.</param>
         /// <returns>A task representing the asynchronous operation. The task result contains the response indicating the success or failure of the operation.</returns>
-        Task<IBaseResponse<bool>> RemoveEmployeeFromProjectAsync(string employeeId, Guid projectId);
+        Task<IBaseResponse<bool>> RemoveEmployeeFromProjectAsync(List<string> employeesId, Guid projectId);
 
         /// <summary>
         /// Retrieves the list of tasks associated with a project.

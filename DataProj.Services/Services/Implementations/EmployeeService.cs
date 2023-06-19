@@ -1,4 +1,5 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Employee;
+using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
 using DataProj.ApiModels.Response.Helpers;
 using DataProj.ApiModels.Response.Interfaces;
 using DataProj.DAL.Repository.Interfaces;
@@ -125,31 +126,65 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-        public async Task<IBaseResponse<bool>> AssignEmployeeToProjectAsync(string employeeId, Guid projectId)
+        public async Task<IBaseResponse<bool>> AssignEmployeeToProjectAsync(List<string> employeesId, Guid projectId)
         {
             try
             {
-                StringValidator.CheckIsNotNull(employeeId);
+                ObjectValidator<List<string>>.CheckIsNotNullObject(employeesId);
                 ObjectValidator<Guid>.CheckIsNotNullObject(projectId);
 
-                var employee = await _userManager.FindByIdAsync(employeeId);
-                ObjectValidator<Employee>.CheckIsNotNullObject(employee);
+                foreach (var emp in  employeesId)
+                {
+                    var employee = await _userManager.FindByIdAsync(emp);
+                    ObjectValidator<Employee>.CheckIsNotNullObject(employee);
+                }
+     
+                var project = await _repository.ReadByIdAsync(projectId);
+                project.Employees = employeesId.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList();
+
+                await _repository.UpdateAsync(project);
+
+                return ResponseFactory<bool>.CreateSuccessResponse(true);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return ResponseFactory<bool>.CreateNotFoundResponse(ex);
+            }
+            catch (Exception ex)
+            {
+                return ResponseFactory<bool>.CreateErrorResponse(ex);
+            }
+        }
+
+        public async Task<IBaseResponse<bool>> RemoveEmployeeFromProjectAsync(List<string> employeesId, Guid projectId)
+        {
+            try
+            {
+                ObjectValidator<List<string>>.CheckIsNotNullObject(employeesId);
+
+                ObjectValidator<Guid>.CheckIsNotNullObject(projectId);
+
+                foreach (var emp in employeesId)
+                {
+                    var employee = await _userManager.FindByIdAsync(emp);
+                    ObjectValidator<Employee>.CheckIsNotNullObject(employee);
+                }
 
                 var project = await _repository.ReadByIdAsync(projectId);
 
-                var projectEmployee = new ProjectEmployee
+                var projectEmployee = employeesId.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList();
+                //var projectEmployee = project.Employees.FirstOrDefault(pe => pe.EmployeeId == employeeId);
+                if (projectEmployee != null)
                 {
-                    Employee = employee,
-                    Project = project,
-                    EmployeeId = employeeId,
-                    ProjectId = projectId
-                };
-
-                project.Employees.Add(projectEmployee);
-                employee.Projects.Add(projectEmployee);
+                    foreach (var emp in projectEmployee)
+                    {
+                        project.Employees.Remove(emp);
+                    }
+                    await _repository.UpdateAsync(project);
+                }
 
                 await _repository.UpdateAsync(project);
-                await _userManager.UpdateAsync(employee);
+
 
                 return ResponseFactory<bool>.CreateSuccessResponse(true);
             }
@@ -268,37 +303,7 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-        public async Task<IBaseResponse<bool>> RemoveEmployeeFromProjectAsync(string employeeId, Guid projectId)
-        {
-            try
-            {
-                StringValidator.CheckIsNotNull(employeeId);
-                ObjectValidator<Guid>.CheckIsNotNullObject(projectId);
-
-                var employee = await _userManager.FindByIdAsync(employeeId);
-                ObjectValidator<Employee>.CheckIsNotNullObject(employee);
-
-                var project = await _repository.ReadByIdAsync(projectId);
-                ObjectValidator<Project>.CheckIsNotNullObject(project);
-
-                var projectEmployee = project.Employees.FirstOrDefault(pe => pe.EmployeeId == employeeId);
-                if (projectEmployee != null)
-                {
-                    project.Employees.Remove(projectEmployee);
-                    await _repository.UpdateAsync(project);
-                }
-
-                return ResponseFactory<bool>.CreateSuccessResponse(true);
-            }
-            catch (ArgumentNullException ex)
-            {
-                return ResponseFactory<bool>.CreateNotFoundResponse(ex);
-            }
-            catch (Exception ex)
-            {
-                return ResponseFactory<bool>.CreateErrorResponse(ex);
-            }
-        }
+      
 
         public async Task<IBaseResponse<bool>> SetEmployeeNewRoleByIdAsync(string employeeId, Roles roleType)
         {

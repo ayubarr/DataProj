@@ -7,16 +7,20 @@ using DataProj.Domain.Models.Enums;
 using DataProj.Services.Helpers;
 using DataProj.Services.Services.Interfaces;
 using DataProj.ValidationHelper;
+using Microsoft.AspNetCore.Identity;
 
 namespace DataProj.Services.Services.Implementations
 {
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
+        private readonly UserManager<Employee> _userManager;
 
-        public ProjectService(IProjectRepository projectRepository)
+        public ProjectService(IProjectRepository projectRepository,
+            UserManager<Employee> userManager)
         {
             _projectRepository = projectRepository;
+            _userManager = userManager;
         }
 
         public async Task<IBaseResponse<Guid>> CreateAsync(CreateProjectDTO createProjectDto)
@@ -32,8 +36,13 @@ namespace DataProj.Services.Services.Implementations
                     ClientCompanyName = createProjectDto.ClientCompanyName,
                     ExecutiveCompanyName = createProjectDto.ExecutiveCompanyName,
                     ProjectManagerId = createProjectDto.ProjectManagerId,
-                    Employees = createProjectDto.EmployeesIds.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList()
+                   // Employees = createProjectDto.EmployeesIds.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList()
                 };
+
+                var projectManager = await _userManager.FindByIdAsync(createProjectDto.ProjectManagerId);
+                var employees = createProjectDto.EmployeesIds.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList();
+                project.ProjectManager = projectManager;
+                project.Employees = employees;
 
                 await _projectRepository.Create(project);
 
@@ -129,7 +138,7 @@ namespace DataProj.Services.Services.Implementations
             {
                 ObjectValidator<UpdateProjectDTO>.CheckIsNotNullObject(updateProjectDto);
 
-                var project = await _projectRepository.GetFilteredProjectByIdAsync(id);
+                var project = await _projectRepository.ReadByIdAsync(id);
 
                 project.Name = updateProjectDto.Name;
                 project.Priority = updateProjectDto.Priority;

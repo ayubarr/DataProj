@@ -80,19 +80,19 @@ namespace DataProj.API.Controllers
 
 
         [HttpPost]
-        [Route("assign-to-project/{employeeId}/{projectId}")]
-        public async Task<IActionResult> Assign(string employeeId, Guid projectId)
+        [Route("assign-to-project/{projectId}")]
+        public async Task<IActionResult> Assign(List<string> employeesId, Guid projectId)
         {
-            var response = await _employeeService.AssignEmployeeToProjectAsync(employeeId, projectId);
+            var response = await _employeeService.AssignEmployeeToProjectAsync(employeesId, projectId);
             return Ok(response);
         }
 
 
         [HttpPost]
-        [Route("remove-from-project/{employeeId}/{projectId}")]
-        public async Task<IActionResult> RemoveFromProject(string employeeId, Guid projectId)
+        [Route("remove-from-project/{projectId}")]
+        public async Task<IActionResult> RemoveFromProject(List<string> employeesId, Guid projectId)
         {
-            var response = await _employeeService.RemoveEmployeeFromProjectAsync(employeeId, projectId);
+            var response = await _employeeService.RemoveEmployeeFromProjectAsync(employeesId, projectId);
             return Ok(response);
         }
 

@@ -12,7 +12,7 @@ namespace DataProj.Domain.Models.Entities
         public DateTime EndDate { get; set; }
         public int Priority { get; set; }
 
-        public ICollection<ProjectEmployee> Employees { get; set; }
+        public ICollection<ProjectEmployee> Employees { get; set; } = new List<ProjectEmployee>();
 
         [ForeignKey("ProjectManagerId")]
         public Employee ProjectManager { get; set; }

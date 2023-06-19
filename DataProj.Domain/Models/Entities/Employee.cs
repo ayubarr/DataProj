@@ -12,7 +12,7 @@ namespace DataProj.Domain.Models.Entities
 
         public string FullName() => $"{FirstName} {LastName} {MiddleName}";
 
-        public ICollection<ProjectEmployee> Projects { get; set; }
+        public ICollection<ProjectEmployee> Projects { get; set; } 
         public ICollection<TaskItem>? ExecutorTasks { get; set; } 
         public ICollection<TaskItem>? AuthoredTasks { get; set; } 
     }

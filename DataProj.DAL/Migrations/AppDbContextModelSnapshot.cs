@@ -130,7 +130,6 @@ namespace DataProj.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ProjectManagerId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("StartDate")
@@ -145,7 +144,7 @@ namespace DataProj.DAL.Migrations
 
             modelBuilder.Entity("DataProj.Domain.Models.Entities.ProjectEmployee", b =>
                 {
-                    b.Property<Guid>("ProjectId")
+                    b.Property<Guid?>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("EmployeeId")
@@ -358,8 +357,7 @@ namespace DataProj.DAL.Migrations
                     b.HasOne("DataProj.Domain.Models.Entities.Employee", "ProjectManager")
                         .WithMany()
                         .HasForeignKey("ProjectManagerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ProjectManager");
                 });

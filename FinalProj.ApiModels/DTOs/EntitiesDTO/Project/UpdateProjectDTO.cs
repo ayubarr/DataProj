@@ -41,6 +41,6 @@ namespace DataProj.ApiModels.DTOs.EntitiesDTO.Project
         /// <summary>
         /// Gets or sets Employees Id of the project
         /// </summary>
-        public List<int> EmployeesIds { get; set; }
+
     }
 }

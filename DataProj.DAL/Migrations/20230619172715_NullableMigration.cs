@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataProj.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class NullableMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -174,7 +174,7 @@ namespace DataProj.DAL.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false),
-                    ProjectManagerId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    ProjectManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -196,8 +196,8 @@ namespace DataProj.DAL.Migrations
                     Comment = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false),
-                    AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ExecutorId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ExecutorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
