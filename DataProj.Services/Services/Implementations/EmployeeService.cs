@@ -67,23 +67,24 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-        public async Task<IBaseResponse<bool>> UpdateAsync(UpdateEmployeeDTO employeeDto)
+        public async Task<IBaseResponse<bool>> UpdateAsync(string id, UpdateEmployeeDTO employeeDto)
         {
             try
             {
                 ObjectValidator<UpdateEmployeeDTO>.CheckIsNotNullObject(employeeDto);
-                var employee = MapperHelperForUser<UpdateEmployeeDTO, Employee>.Map(employeeDto);
 
-                var result = await _userManager.UpdateAsync(employee);
+                var employee = await _userManager.FindByIdAsync(id);
+                if (employee is null)
+                    throw new ArgumentNullException("User Not found");
 
-                if (result.Succeeded)
-                {
-                    return ResponseFactory<bool>.CreateSuccessResponse(true);
-                }
-                else
-                {
-                    return ResponseFactory<bool>.CreateErrorResponse(new Exception("Failed to update user."));
-                }
+                employee.Email = employeeDto.Email;
+                employee.FirstName = employeeDto.FirstName;
+                employee.LastName = employeeDto.LastName;
+                employee.MiddleName = employeeDto.MiddleName;
+
+                await _userManager.UpdateAsync(employee);
+
+                return ResponseFactory<bool>.CreateSuccessResponse(true);               
             }
             catch (ArgumentNullException ex)
             {

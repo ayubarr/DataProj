@@ -1,8 +1,10 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
 using DataProj.ApiModels.Response.Interfaces;
+using DataProj.Domain.Models.Entities;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace DataProj.API.Controllers
 {
@@ -21,35 +23,35 @@ namespace DataProj.API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] FilterProjectDTO projectFilterDto, [FromQuery] Sort? sortOrder)
         {
             var response = await _projectService.GetAsync(projectFilterDto, sortOrder);
-            return CreateResponseFromBaseResponse(response);
+            return Ok(response.Data);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
             var response = await _projectService.GetByIdAsync(id);
-            return CreateResponseFromBaseResponse(response);
+            return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateProjectDTO createProjectDto)
         {
             var response = await _projectService.CreateAsync(createProjectDto);
-            return CreateResponseFromBaseResponse(response);
+            return Ok(response);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Update(UpdateProjectDTO projectDto)
+        [HttpPut("{projectid}/{projectDto}")]
+        public async Task<IActionResult> Update(Guid projectid, UpdateProjectDTO projectDto)
         {
-            var response = await _projectService.UpdateAsync(projectDto);
-            return CreateResponseFromBaseResponse(response);
+            var response = await _projectService.UpdateAsync(projectid, projectDto);
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var response = await _projectService.DeleteAsync(id);
-            return CreateResponseFromBaseResponse(response);
+            return Ok(response);
         }
 
         private IActionResult CreateResponseFromBaseResponse<T>(IBaseResponse<T> baseResponse)

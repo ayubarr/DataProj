@@ -1,4 +1,5 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Assignment;
+using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
 using DataProj.ApiModels.Response.Interfaces;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Services.Interfaces;
@@ -38,10 +39,10 @@ namespace DataProj.API.Controllers
             return CreateResponseFromBaseResponse(response);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Update(UpdateTaskItemDTO taskItemDto)
+        [HttpPut("{taskId}/{taskDto}")]
+        public async Task<IActionResult> Update(Guid taskId, UpdateTaskItemDTO taskDto)
         {
-            var response = await _taskItemService.UpdateAsync(taskItemDto);
+            var response = await _taskItemService.UpdateAsync(taskId, taskDto);
             return CreateResponseFromBaseResponse(response);
         }
 

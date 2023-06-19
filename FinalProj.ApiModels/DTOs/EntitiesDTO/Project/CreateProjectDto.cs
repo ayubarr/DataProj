@@ -11,7 +11,7 @@ namespace DataProj.ApiModels.DTOs.EntitiesDTO.Project
         /// <summary>
         /// Gets or sets the name of the project.
         /// </summary>
-        public string ProjectName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the client company.
@@ -21,7 +21,7 @@ namespace DataProj.ApiModels.DTOs.EntitiesDTO.Project
         /// <summary>
         /// Gets or sets the name of the executing company.
         /// </summary>
-        public string ExecutingCompanyName { get; set; }
+        public string ExecutiveCompanyName { get; set; }
 
         /// <summary>
         /// Gets or sets the start date of the project.
@@ -44,5 +44,6 @@ namespace DataProj.ApiModels.DTOs.EntitiesDTO.Project
         /// </summary>
         public string ProjectManagerId { get; set; }
 
+        public List<string> EmployeesIds { get; set; }
     }
 }

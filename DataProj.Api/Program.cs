@@ -9,8 +9,10 @@ ConfigurationManager configuration = builder.Configuration;
 
 var connection = builder.Configuration.GetConnectionString("ConnectionString");
 
-builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(connection));
-
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection, sqlOptions =>
+{
+    sqlOptions.EnableRetryOnFailure();
+}));
 builder.Services
     .InitializeIdentity(configuration)
     .InitializeRepositories()

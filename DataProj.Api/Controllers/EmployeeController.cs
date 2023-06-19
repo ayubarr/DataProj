@@ -54,10 +54,10 @@ namespace DataProj.API.Controllers
 
 
 
-        [HttpPut]
-        public async Task<IActionResult> Put(UpdateEmployeeDTO employeeDto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(string id, UpdateEmployeeDTO employeeDto)
         {
-            var response = await _employeeService.UpdateAsync(employeeDto);
+            var response = await _employeeService.UpdateAsync(id, employeeDto);
             return Ok(response.Data);
         }
 

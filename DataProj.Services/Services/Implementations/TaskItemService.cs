@@ -1,13 +1,10 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Assignment;
-using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
 using DataProj.ApiModels.Response.Helpers;
 using DataProj.ApiModels.Response.Interfaces;
-using DataProj.DAL.Repository.Implemintations;
 using DataProj.DAL.Repository.Interfaces;
 using DataProj.Domain.Models.Entities;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Helpers;
-using DataProj.Services.Mapping.Helpers;
 using DataProj.Services.Services.Interfaces;
 using DataProj.ValidationHelper;
 
@@ -22,18 +19,23 @@ namespace DataProj.Services.Services.Implementations
             _taskItemRepository = taskItemRepository;
         }
 
-        public async Task<IBaseResponse<Guid>> CreateAsync(CreateTaskItemDTO createProjectDto)
+        public async Task<IBaseResponse<Guid>> CreateAsync(CreateTaskItemDTO createTaskItemDto)
         {
             try
             {
-                ObjectValidator<CreateTaskItemDTO>.CheckIsNotNullObject(createProjectDto);
+                var taskItem = new TaskItem
+                {
+                    Name = createTaskItemDto.Name,
+                    Comment = createTaskItemDto.Comment,
+                    Status = createTaskItemDto.Status,
+                    Priority = createTaskItemDto.Priority,
+                    AuthorId = createTaskItemDto.AuthorId,
+                    ExecutorId = createTaskItemDto.ExecutorId
+                };
 
-                var task = MapperHelperForEntity<CreateTaskItemDTO, TaskItem>.Map(createProjectDto);
-                task.Id = Guid.NewGuid();
+                await _taskItemRepository.Create(taskItem);
 
-                await _taskItemRepository.Create(task);
-
-                return ResponseFactory<Guid>.CreateSuccessResponse(task.Id);
+                return ResponseFactory<Guid>.CreateSuccessResponse(taskItem.Id);
             }
             catch (ArgumentNullException argNullException)
             {
@@ -67,27 +69,27 @@ namespace DataProj.Services.Services.Implementations
 
         public async Task<IBaseResponse<IEnumerable<TaskItem>>> GetAsync(FilterTaskItemDTO? taskItemFilterDto, Sort? sortOrder)
         {
-
             try
             {
                 ObjectValidator<FilterTaskItemDTO>.CheckIsNotNullObject(taskItemFilterDto);
 
                 var filter = FilterHelper.CreateTaskItemFilter(taskItemFilterDto);
-                var query = _taskItemRepository.GetFilteredTaskItemsAsync(filter).Result;
+
+                var taskItems = await _taskItemRepository.GetFilteredTaskItemsAsync(filter);
 
                 if (sortOrder.HasValue)
                 {
-                    query = sortOrder switch
+                    taskItems = sortOrder switch
                     {
-                        Sort.NameDesc => query.OrderByDescending(t => t.Name),
-                        Sort.NameAsc => query.OrderBy(t => t.Name),
-                        Sort.PriorityDesc => query.OrderByDescending(t => t.Priority),
-                        Sort.PriorityAsc => query.OrderBy(t => t.Priority),
-                        _ => query,
+                        Sort.NameDesc => taskItems.OrderByDescending(t => t.Name),
+                        Sort.NameAsc => taskItems.OrderBy(t => t.Name),
+                        Sort.PriorityDesc => taskItems.OrderByDescending(t => t.Priority),
+                        Sort.PriorityAsc => taskItems.OrderBy(t => t.Priority),
+                        _ => taskItems,
                     };
                 }
 
-                return ResponseFactory<IEnumerable<TaskItem>>.CreateSuccessResponse(query);
+                return ResponseFactory<IEnumerable<TaskItem>>.CreateSuccessResponse(taskItems);
             }
             catch (ArgumentNullException argNullException)
             {
@@ -97,8 +99,6 @@ namespace DataProj.Services.Services.Implementations
             {
                 return ResponseFactory<IEnumerable<TaskItem>>.CreateErrorResponse(exception);
             }
-
-           
         }
 
         public async Task<IBaseResponse<TaskItem>> GetByIdAsync(Guid id)
@@ -121,14 +121,22 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-        public async Task<IBaseResponse<bool>> UpdateAsync(UpdateTaskItemDTO taskItemDto)
+        public async Task<IBaseResponse<bool>> UpdateAsync(Guid id, UpdateTaskItemDTO taskItemDto)
         {
             try
             {
                 ObjectValidator<UpdateTaskItemDTO>.CheckIsNotNullObject(taskItemDto);
 
-                var entity = MapperHelperForEntity<UpdateTaskItemDTO, TaskItem>.Map(taskItemDto);
-                await _taskItemRepository.UpdateAsync(entity);
+                var taskItem = await _taskItemRepository.GetFilteredTaskItemByIdAsync(id);
+
+                taskItem.Name = taskItemDto.Name;
+                taskItem.Comment = taskItemDto.Comment;
+                taskItem.Status = taskItemDto.Status;
+                taskItem.Priority = taskItemDto.Priority;
+                taskItem.AuthorId = taskItemDto.AuthorId;
+                taskItem.ExecutorId = taskItemDto.ExecutorId;
+
+                await _taskItemRepository.UpdateAsync(taskItem);
 
                 return ResponseFactory<bool>.CreateSuccessResponse(true);
             }

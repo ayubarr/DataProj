@@ -5,7 +5,6 @@ using DataProj.DAL.Repository.Interfaces;
 using DataProj.Domain.Models.Entities;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Helpers;
-using DataProj.Services.Mapping.Helpers;
 using DataProj.Services.Services.Interfaces;
 using DataProj.ValidationHelper;
 
@@ -24,20 +23,17 @@ namespace DataProj.Services.Services.Implementations
         {
             try
             {
-                ObjectValidator<CreateProjectDTO>.CheckIsNotNullObject(createProjectDto);
-
-                var project = MapperHelperForEntity<CreateProjectDTO, Project>.Map(createProjectDto);
-                project.Id = Guid.NewGuid();
-
-                var projectEmployee = new ProjectEmployee
+                var project = new Project
                 {
-                    Employee = project.ProjectManager,
-                    Project = project,
-                    EmployeeId = createProjectDto.ProjectManagerId,
-                    ProjectId = project.Id
+                    Name = createProjectDto.Name,
+                    Priority = createProjectDto.Priority,
+                    StartDate = createProjectDto.StartDate,
+                    EndDate = createProjectDto.EndDate,
+                    ClientCompanyName = createProjectDto.ClientCompanyName,
+                    ExecutiveCompanyName = createProjectDto.ExecutiveCompanyName,
+                    ProjectManagerId = createProjectDto.ProjectManagerId,
+                    Employees = createProjectDto.EmployeesIds.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList()
                 };
-
-                project.Employees = new List<ProjectEmployee> { projectEmployee };
 
                 await _projectRepository.Create(project);
 
@@ -80,21 +76,22 @@ namespace DataProj.Services.Services.Implementations
                 ObjectValidator<FilterProjectDTO>.CheckIsNotNullObject(projectFilterDto);
 
                 var filter = FilterHelper.CreateProjectFilter(projectFilterDto);
-                var query = _projectRepository.GetFilteredProjectAsync(filter).Result;
+
+                var projects = await _projectRepository.GetFilteredProjectAsync(filter);
 
                 if (sortOrder.HasValue)
                 {
-                    query = sortOrder switch
+                    projects = sortOrder switch
                     {
-                        Sort.NameDesc => query.OrderByDescending(p => p.Name),
-                        Sort.NameAsc => query.OrderBy(p => p.Name),
-                        Sort.PriorityDesc => query.OrderByDescending(p => p.Priority),
-                        Sort.PriorityAsc => query.OrderBy(p => p.Priority),
-                        _ => query,
+                        Sort.NameDesc => projects.OrderByDescending(x => x.Name).ToList(),
+                        Sort.NameAsc => projects.OrderBy(x => x.Name).ToList(),
+                        Sort.PriorityDesc => projects.OrderByDescending(x => x.Priority).ToList(),
+                        Sort.PriorityAsc => projects.OrderBy(x => x.Priority).ToList(),
+                        _ => projects,
                     };
                 }
 
-                return ResponseFactory<IEnumerable<Project>>.CreateSuccessResponse(query);
+                return ResponseFactory<IEnumerable<Project>>.CreateSuccessResponse(projects);
             }
             catch (ArgumentNullException argNullException)
             {
@@ -126,14 +123,22 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-        public async Task<IBaseResponse<bool>> UpdateAsync(UpdateProjectDTO projectDto)
+        public async Task<IBaseResponse<bool>> UpdateAsync(Guid id, UpdateProjectDTO updateProjectDto)
         {
             try
             {
-                ObjectValidator<UpdateProjectDTO>.CheckIsNotNullObject(projectDto);
+                ObjectValidator<UpdateProjectDTO>.CheckIsNotNullObject(updateProjectDto);
 
-                var entity = MapperHelperForEntity<UpdateProjectDTO, Project>.Map(projectDto);
-                await _projectRepository.UpdateAsync(entity);
+                var project = await _projectRepository.GetFilteredProjectByIdAsync(id);
+
+                project.Name = updateProjectDto.Name;
+                project.Priority = updateProjectDto.Priority;
+                project.StartDate = updateProjectDto.StartDate;
+                project.EndDate = updateProjectDto.EndDate;
+                project.ClientCompanyName = updateProjectDto.ClientCompanyName;
+                project.ExecutiveCompanyName = updateProjectDto.ExecutiveCompanyName;
+
+                await _projectRepository.UpdateAsync(project);
 
                 return ResponseFactory<bool>.CreateSuccessResponse(true);
             }

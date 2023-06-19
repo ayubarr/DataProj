@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataProj.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230618064626_Init")]
+    [Migration("20230618120331_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -124,17 +124,17 @@ namespace DataProj.DAL.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
                     b.Property<string>("ProjectManagerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProjectName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");

@@ -29,7 +29,7 @@ namespace DataProj.Services.Services.Interfaces
         /// </summary>
         /// <param name="employeeDto">The employee object containing the updated details.</param>
         /// <returns>A task representing the asynchronous operation. The task result contains the response indicating the success or failure of the operation.</returns>
-        Task<IBaseResponse<bool>> UpdateAsync(UpdateEmployeeDTO employeeDto);
+        Task<IBaseResponse<bool>> UpdateAsync(string id, UpdateEmployeeDTO employeeDto);
 
         /// <summary>
         /// Deletes the specified employee by their ID.

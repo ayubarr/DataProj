@@ -23,11 +23,6 @@ namespace DataProj.ApiModels.DTOs.EntitiesDTO.Employee
         /// <summary>
         /// Gets or sets the email address of the employee.
         /// </summary>
-        public string Email { get; set; }
-
-        /// <summary>
-        /// Gets or sets the role of the employee.
-        /// </summary>
-        public Roles UserType { get; set; }
+        public string? Email { get; set; }
     }
 }
