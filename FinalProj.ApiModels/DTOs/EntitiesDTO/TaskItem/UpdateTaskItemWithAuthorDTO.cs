@@ -1,9 +1,9 @@
 ﻿using DataProj.ApiModels.DTOs.BaseDTOs;
 using DataProj.Domain.Models.Enums;
 
-namespace DataProj.ApiModels.DTOs.EntitiesDTO.Assignment
+namespace FinalProj.ApiModels.DTOs.EntitiesDTO.TaskItem
 {
-    public class UpdateTaskItemDTO : BaseEntityDTO
+    public class UpdateTaskItemWithAuthorDTO : BaseEntityDTO
     {
         /// <summary>
         /// Gets or sets the name of the task.
@@ -29,9 +29,5 @@ namespace DataProj.ApiModels.DTOs.EntitiesDTO.Assignment
         /// Gets or sets AuthorId
         /// </summary>
         public string? AuthorId { get; set; }
-        /// <summary>
-        /// Gets or sets ExecutorId
-        /// </summary>
-        public string? ExecutorId { get; set; }
     }
 }

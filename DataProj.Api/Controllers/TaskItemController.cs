@@ -1,9 +1,10 @@
-﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Assignment;
+﻿using DataProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
 using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
 using DataProj.ApiModels.Response.Interfaces;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using FinalProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
 
 namespace DataProj.API.Controllers
 {
@@ -22,44 +23,42 @@ namespace DataProj.API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] FilterTaskItemDTO taskItemFilterDto, [FromQuery] Sort? sortOrder)
         {
             var response = await _taskItemService.GetAsync(taskItemFilterDto, sortOrder);
-            return CreateResponseFromBaseResponse(response);
+            return Ok(response.Data);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
             var response = await _taskItemService.GetByIdAsync(id);
-            return CreateResponseFromBaseResponse(response);
+            return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateTaskItemDTO createTaskItemDto)
         {
             var response = await _taskItemService.CreateAsync(createTaskItemDto);
-            return CreateResponseFromBaseResponse(response);
+            return Ok(response);
         }
 
-        [HttpPut("{taskId}/{taskDto}")]
-        public async Task<IActionResult> Update(Guid taskId, UpdateTaskItemDTO taskDto)
+        [HttpPut("update-executor/{taskId}")]
+        public async Task<IActionResult> UpdateExecutor(Guid taskId, UpdateTaskItemWithExecutorDTO taskDto)
         {
-            var response = await _taskItemService.UpdateAsync(taskId, taskDto);
-            return CreateResponseFromBaseResponse(response);
+            var response = await _taskItemService.UpdateExecutorAsync(taskId, taskDto);
+            return Ok(response.Data);
+        }
+
+        [HttpPut("update-author/{taskId}")]
+        public async Task<IActionResult> UpdateAuthor(Guid taskId, UpdateTaskItemWithAuthorDTO taskDto)
+        {
+            var response = await _taskItemService.UpdateAuthorAsync(taskId, taskDto);
+            return Ok(response.Data);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var response = await _taskItemService.DeleteAsync(id);
-            return CreateResponseFromBaseResponse(response);
-        }
-
-        private IActionResult CreateResponseFromBaseResponse<T>(IBaseResponse<T> baseResponse)
-        {
-            if (baseResponse.IsSuccess)
-            {
-                return Ok(baseResponse.Data);
-            }
-            return NotFound(baseResponse.Message);
+            return Ok(response);
         }
     }
 }

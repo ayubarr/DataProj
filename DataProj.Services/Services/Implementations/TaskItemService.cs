@@ -1,4 +1,4 @@
-﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Assignment;
+﻿using DataProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
 using DataProj.ApiModels.Response.Helpers;
 using DataProj.ApiModels.Response.Interfaces;
 using DataProj.DAL.Repository.Interfaces;
@@ -7,6 +7,7 @@ using DataProj.Domain.Models.Enums;
 using DataProj.Services.Helpers;
 using DataProj.Services.Services.Interfaces;
 using DataProj.ValidationHelper;
+using FinalProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
 
 namespace DataProj.Services.Services.Implementations
 {
@@ -107,7 +108,7 @@ namespace DataProj.Services.Services.Implementations
             {
                 ObjectValidator<Guid>.CheckIsNotNullObject(id);
 
-                var taskItem = await _taskItemRepository.GetFilteredTaskItemByIdAsync(id);
+                var taskItem = await _taskItemRepository.ReadByIdAsync(id);
 
                 return ResponseFactory<TaskItem>.CreateSuccessResponse(taskItem);
             }
@@ -121,11 +122,11 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-        public async Task<IBaseResponse<bool>> UpdateAsync(Guid id, UpdateTaskItemDTO taskItemDto)
+        public async Task<IBaseResponse<bool>> UpdateAuthorAsync(Guid id, UpdateTaskItemWithAuthorDTO taskItemDto)
         {
             try
             {
-                ObjectValidator<UpdateTaskItemDTO>.CheckIsNotNullObject(taskItemDto);
+                ObjectValidator<UpdateTaskItemWithAuthorDTO>.CheckIsNotNullObject(taskItemDto);
 
                 var taskItem = await _taskItemRepository.GetFilteredTaskItemByIdAsync(id);
 
@@ -134,6 +135,33 @@ namespace DataProj.Services.Services.Implementations
                 taskItem.Status = taskItemDto.Status;
                 taskItem.Priority = taskItemDto.Priority;
                 taskItem.AuthorId = taskItemDto.AuthorId;
+
+                await _taskItemRepository.UpdateAsync(taskItem);
+
+                return ResponseFactory<bool>.CreateSuccessResponse(true);
+            }
+            catch (ArgumentNullException argNullException)
+            {
+                return ResponseFactory<bool>.CreateNotFoundResponse(argNullException);
+            }
+            catch (Exception exception)
+            {
+                return ResponseFactory<bool>.CreateErrorResponse(exception);
+            }
+        }
+
+        public async Task<IBaseResponse<bool>> UpdateExecutorAsync(Guid id, UpdateTaskItemWithExecutorDTO taskItemDto)
+        {
+            try
+            {
+                ObjectValidator<UpdateTaskItemWithExecutorDTO>.CheckIsNotNullObject(taskItemDto);
+
+                var taskItem = await _taskItemRepository.GetFilteredTaskItemByIdAsync(id);
+
+                taskItem.Name = taskItemDto.Name;
+                taskItem.Comment = taskItemDto.Comment;
+                taskItem.Status = taskItemDto.Status;
+                taskItem.Priority = taskItemDto.Priority;
                 taskItem.ExecutorId = taskItemDto.ExecutorId;
 
                 await _taskItemRepository.UpdateAsync(taskItem);

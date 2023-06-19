@@ -1,10 +1,7 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
-using DataProj.ApiModels.Response.Interfaces;
-using DataProj.Domain.Models.Entities;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace DataProj.API.Controllers
 {
@@ -40,7 +37,7 @@ namespace DataProj.API.Controllers
             return Ok(response);
         }
 
-        [HttpPut("{projectid}/{projectDto}")]
+        [HttpPut("{projectid}")]
         public async Task<IActionResult> Update(Guid projectid, UpdateProjectDTO projectDto)
         {
             var response = await _projectService.UpdateAsync(projectid, projectDto);
@@ -52,15 +49,6 @@ namespace DataProj.API.Controllers
         {
             var response = await _projectService.DeleteAsync(id);
             return Ok(response);
-        }
-
-        private IActionResult CreateResponseFromBaseResponse<T>(IBaseResponse<T> baseResponse)
-        {
-            if (baseResponse.IsSuccess)
-            {
-                return Ok(baseResponse.Data);
-            }
-            return NotFound(baseResponse.Message);
         }
     }
 }

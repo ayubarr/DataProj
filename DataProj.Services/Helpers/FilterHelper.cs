@@ -1,4 +1,4 @@
-﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Assignment;
+﻿using DataProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
 using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
 using DataProj.Domain.Models.Entities;
 using LinqKit;

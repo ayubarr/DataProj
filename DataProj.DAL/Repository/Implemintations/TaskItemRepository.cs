@@ -2,6 +2,7 @@
 using DataProj.DAL.SqlServer;
 using DataProj.Domain.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DataProj.DAL.Repository.Implemintations
 {
@@ -11,19 +12,15 @@ namespace DataProj.DAL.Repository.Implemintations
         {
         }
 
-        public async Task<IEnumerable<TaskItem>> GetFilteredTaskItemsAsync(Func<TaskItem, bool> filter)
+        public async Task<IEnumerable<TaskItem>> GetFilteredTaskItemsAsync(Expression<Func<TaskItem, bool>> filter)
         {
-            return await _dbSet
-                   .AsNoTracking()
-                   .Where(filter)
-                   .AsQueryable()
-                   .ToListAsync();
+            return await ReadAll().Where(filter).ToListAsync();
+
         }
 
         public async Task<TaskItem> GetFilteredTaskItemByIdAsync(Guid id)
         {
             var taskItem = await _dbSet
-                                 .AsNoTracking()
                                  .Include(t => t.Author)
                                  .ThenInclude(e => e.AuthoredTasks)
                                  .Include(t => t.Executor)

@@ -23,7 +23,7 @@ namespace DataProj.DAL.Repository.Implemintations
             var project = await ReadAll()
                   .Include(x => x.Employees)
                   .ThenInclude(x => x.Employee)
-                  //.Include(x => x.ProjectManager)
+                  .Include(x => x.ProjectManager)
                   .FirstOrDefaultAsync(x => x.Id == id);
 
             return project == null

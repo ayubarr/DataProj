@@ -1,7 +1,7 @@
 ﻿using DataProj.ApiModels.DTOs.BaseDTOs;
 using DataProj.Domain.Models.Enums;
 
-namespace DataProj.ApiModels.DTOs.EntitiesDTO.Assignment
+namespace DataProj.ApiModels.DTOs.EntitiesDTO.TaskItem
 {
     public class FilterTaskItemDTO : BaseEntityDTO
     {

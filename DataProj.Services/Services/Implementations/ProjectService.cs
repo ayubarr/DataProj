@@ -109,7 +109,7 @@ namespace DataProj.Services.Services.Implementations
             {
                 ObjectValidator<Guid>.CheckIsNotNullObject(id);
 
-                var project = await _projectRepository.GetFilteredProjectByIdAsync(id);
+                var project = await _projectRepository.ReadByIdAsync(id);
 
                 return ResponseFactory<Project>.CreateSuccessResponse(project);
             }
