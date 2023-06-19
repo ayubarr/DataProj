@@ -156,6 +156,7 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
+        //TODO: FIX
         public async Task<IBaseResponse<bool>> RemoveEmployeeFromProjectAsync(List<string> employeesId, Guid projectId)
         {
             try
