@@ -1,11 +1,11 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Employee;
+using DataProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
 using DataProj.ApiModels.Response.Interfaces;
 using DataProj.Domain.Models.Entities;
 using DataProj.Domain.Models.Enums;
 
 namespace DataProj.Services.Services.Interfaces
 {
-
     /// <summary>
     /// Service for managing employee entities and their roles, projects, and tasks.
     /// </summary>
@@ -45,7 +45,13 @@ namespace DataProj.Services.Services.Interfaces
         /// <param name="roleType">The type of role to assign.</param>
         /// <returns>A task representing the asynchronous operation. The task result contains the response indicating the success or failure of the operation.</returns>
         Task<IBaseResponse<bool>> SetEmployeeNewRoleByIdAsync(string employeeId, Roles roleType);
-
+        /// <summary>
+        /// Checks the specified employee as an Role.
+        /// </summary>
+        /// <param name="userId">The ID of the user.</param>
+        /// <param name="role">The type of role to assign</param>
+        /// <returns></returns>
+        Task<IBaseResponse<string>> CheckUserRole(string userId, Roles role);
         /// <summary>
         /// Retrieves the list of projects associated with an employee.
         /// </summary>
@@ -74,7 +80,7 @@ namespace DataProj.Services.Services.Interfaces
         /// </summary>
         /// <param name="projectId">The ID of the project.</param>
         /// <returns>A task representing the asynchronous operation. The task result contains the response with the list of tasks or an error if the operation fails.</returns>
-        Task<IBaseResponse<IEnumerable<TaskItem>>> GetProjectTasksAsync(string employeeId);
+        Task<IBaseResponse<IEnumerable<TaskItem>>> GetEmployeeTasksAsync(string employeeId);
 
         /// <summary>
         /// Assigns an employee as the executor of a task.

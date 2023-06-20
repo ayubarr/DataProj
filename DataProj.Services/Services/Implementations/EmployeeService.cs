@@ -1,16 +1,13 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Employee;
-using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
 using DataProj.ApiModels.Response.Helpers;
 using DataProj.ApiModels.Response.Interfaces;
 using DataProj.DAL.Repository.Interfaces;
 using DataProj.Domain.Models.Entities;
 using DataProj.Domain.Models.Enums;
-using DataProj.Services.Mapping.Helpers;
 using DataProj.Services.Services.Interfaces;
 using DataProj.ValidationHelper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace DataProj.Services.Services.Implementations
 {
@@ -86,7 +83,7 @@ namespace DataProj.Services.Services.Implementations
 
                 await _userManager.UpdateAsync(employee);
 
-                return ResponseFactory<bool>.CreateSuccessResponse(true);               
+                return ResponseFactory<bool>.CreateSuccessResponse(true);
             }
             catch (ArgumentNullException ex)
             {
@@ -134,12 +131,12 @@ namespace DataProj.Services.Services.Implementations
                 ObjectValidator<List<string>>.CheckIsNotNullObject(employeesId);
                 ObjectValidator<Guid>.CheckIsNotNullObject(projectId);
 
-                foreach (var emp in  employeesId)
+                foreach (var emp in employeesId)
                 {
                     var employee = await _userManager.FindByIdAsync(emp);
                     ObjectValidator<Employee>.CheckIsNotNullObject(employee);
                 }
-     
+
                 var project = await _projectRepository.ReadByIdAsync(projectId);
                 project.Employees = employeesId.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList();
 
@@ -172,14 +169,14 @@ namespace DataProj.Services.Services.Implementations
                 }
 
                 var project = await _projectRepository.GetFilteredProjectByIdAsync(projectId);
-                    
+
                 var projectEmployeesToRemove = project.Employees.Where(pe => employeesId.Contains(pe.EmployeeId)).ToList();
 
                 foreach (var projectEmployee in projectEmployeesToRemove)
                 {
                     project.Employees.Remove(projectEmployee);
                 }
-          
+
                 await _projectRepository.UpdateAsync(project);
 
                 return ResponseFactory<bool>.CreateSuccessResponse(true);
@@ -196,7 +193,7 @@ namespace DataProj.Services.Services.Implementations
 
         public async Task<IBaseResponse<bool>> AssignExecutorToTaskAsync(Guid taskId, string employeeId)
         {
-        
+
             try
             {
                 ObjectValidator<Guid>.CheckIsNotNullObject(taskId);
@@ -254,9 +251,6 @@ namespace DataProj.Services.Services.Implementations
             {
                 StringValidator.CheckIsNotNull(employeeId);
 
-                var employee = await _userManager.FindByIdAsync(employeeId);
-                ObjectValidator<Employee>.CheckIsNotNullObject(employee);
-
                 var projects = await _projectRepository.ReadAllAsync().Result
                     .Where(p => p.Employees
                     .Any(pe => pe.EmployeeId == employeeId))
@@ -277,7 +271,7 @@ namespace DataProj.Services.Services.Implementations
         }
 
         //TO DO: FIx
-        public async Task<IBaseResponse<IEnumerable<TaskItem>>> GetProjectTasksAsync(string employeeId)
+        public async Task<IBaseResponse<IEnumerable<TaskItem>>> GetEmployeeTasksAsync(string employeeId)
         {
             try
             {
@@ -285,9 +279,12 @@ namespace DataProj.Services.Services.Implementations
 
                 var manager = await _userManager.FindByIdAsync(employeeId);
 
-                
+                var tasks = _taskItemRepository.ReadAllAsync().Result
+                    .Where(t => t.ExecutorId == employeeId)
+                    .ToList();
 
-                var tasks = manager.ExecutorTasks;
+
+
 
                 ObjectValidator<IEnumerable<TaskItem>>.CheckIsNotNullObject(tasks);
 
@@ -303,7 +300,37 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-      
+        public async Task<IBaseResponse<string>> CheckUserRole(string userId, Roles role)
+        {
+            try
+            {
+                StringValidator.CheckIsNotNull(userId);
+
+                var user = await _userManager.FindByIdAsync(userId);
+                ObjectValidator<Employee>.CheckIsNotNullObject(user);
+                
+                var roleName = role.ToString();
+
+                bool isInRole = await _userManager.IsInRoleAsync(user, roleName);
+
+                if (isInRole)
+                {
+                    return ResponseFactory<string>.CreateSuccessResponse($"User role is: {roleName}");
+                }
+                else
+                {
+                    throw new ArgumentNullException("its role not found");
+                }
+            }
+            catch (ArgumentNullException argNullException)
+            {
+                return ResponseFactory<string>.CreateNotFoundResponse(argNullException);
+            }
+            catch (Exception ex)
+            {
+                return ResponseFactory<string>.CreateErrorResponse(ex);
+            }
+        }
 
         public async Task<IBaseResponse<bool>> SetEmployeeNewRoleByIdAsync(string employeeId, Roles roleType)
         {
@@ -312,6 +339,7 @@ namespace DataProj.Services.Services.Implementations
                 StringValidator.CheckIsNotNull(employeeId);
 
                 var employee = await _userManager.FindByIdAsync(employeeId);
+                ObjectValidator<Employee>.CheckIsNotNullObject(employee);
                 List<string> roles = new List<string>()
                 {
                     Roles.Employee.ToString(),
@@ -321,8 +349,15 @@ namespace DataProj.Services.Services.Implementations
                 };
 
                 await _userManager.RemoveFromRolesAsync(employee, roles);
+                //await _userManager.RemoveFromRoleAsync(employee, Roles.Employee.ToString());
+                //await _userManager.RemoveFromRoleAsync(employee, Roles.Manager.ToString());
+                //await _userManager.RemoveFromRoleAsync(employee, Roles.Admin.ToString());
+                //await _userManager.RemoveFromRoleAsync(employee, Roles.Supervisor.ToString());
+
+
 
                 var result = await _userManager.AddToRoleAsync(employee, roleType.ToString());
+
 
                 if (result.Succeeded)
                 {

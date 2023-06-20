@@ -1,9 +1,14 @@
 ﻿using DataProj.ApiModels.Auth.Models;
 using DataProj.ApiModels.DTOs.EntitiesDTO.Employee;
+using DataProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
 using DataProj.Domain.Models.Entities;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using System.Threading.Tasks;
+using FinalProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
 
 namespace DataProj.API.Controllers
 {
@@ -45,11 +50,33 @@ namespace DataProj.API.Controllers
         }
 
         [HttpGet]
-        [Route("get-projects-tasks/{employeeId}")]
-        public async Task<IActionResult> GetTasks(string employeeId)
+        [Route("get-tasks/{employeeId}")]
+        public async Task<IActionResult> GetTasks( string employeeId)
         {
-            var response = await _employeeService.GetProjectTasksAsync(employeeId);
-            return Ok(response.Data);
+            var response = await _employeeService.GetEmployeeTasksAsync(employeeId);
+
+            var taskDtos = response.Data.Select(task => new TaskItemDTO
+            {
+                TaskItemId = task.Id,
+                Name = task.Name,
+                Comment = task.Comment,
+                Status = task.Status,
+                Priority = task.Priority,
+                AuthorId = task.AuthorId,
+                ExecutorId = task.ExecutorId
+            });
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                IgnoreNullValues = true,
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+
+            var tasksJson = JsonSerializer.Serialize(taskDtos, options);
+
+
+            return Content(tasksJson, "application/json");
         }
 
 
@@ -62,8 +89,23 @@ namespace DataProj.API.Controllers
         }
 
 
+        [HttpGet("checkUserRole/{userId}/{roleType}")]
+        public async Task<IActionResult> CheckUserRole(string userId, Roles roleType)
+        {
+            var response = await _employeeService.CheckUserRole(userId, roleType);
+
+            if (response.IsSuccess)
+            {
+                return Ok(response.Data);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
+        }
+
         [HttpPut]
-        [Route("put-role/{userid}/{roletype}")]
+        [Route("put-role/{userId}/{roleType}")]
         public async Task<IActionResult> PutRoleById(string userId, Roles roleType)
         {
             var response = await _employeeService.SetEmployeeNewRoleByIdAsync(userId, roleType);

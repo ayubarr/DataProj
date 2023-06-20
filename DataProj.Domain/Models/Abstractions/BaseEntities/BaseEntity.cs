@@ -1,4 +1,6 @@
-﻿namespace DataProj.Domain.Models.Abstractions.BaseEntities
+﻿using System.Text.Json.Serialization;
+
+namespace DataProj.Domain.Models.Abstractions.BaseEntities
 {
     /// <summary>
     /// Base entity class with a unique identifier.
