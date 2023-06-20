@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace DataProj.API.Controllers
 {
