@@ -1,10 +1,9 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
-using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
-using DataProj.ApiModels.Response.Interfaces;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using FinalProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DataProj.API.Controllers
 {
@@ -19,13 +18,14 @@ namespace DataProj.API.Controllers
             _taskItemService = taskItemService;
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager")]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] FilterTaskItemDTO taskItemFilterDto, [FromQuery] Sort? sortOrder)
         {
             var response = await _taskItemService.GetAsync(taskItemFilterDto, sortOrder);
             return Ok(response.Data);
         }
-
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -33,6 +33,7 @@ namespace DataProj.API.Controllers
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateTaskItemDTO createTaskItemDto)
         {
@@ -40,6 +41,7 @@ namespace DataProj.API.Controllers
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager")]
         [HttpPut("update-executor/{taskId}")]
         public async Task<IActionResult> UpdateExecutor(Guid taskId, UpdateTaskItemWithExecutorDTO taskDto)
         {
@@ -47,6 +49,7 @@ namespace DataProj.API.Controllers
             return Ok(response.Data);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager")]
         [HttpPut("update-author/{taskId}")]
         public async Task<IActionResult> UpdateAuthor(Guid taskId, UpdateTaskItemWithAuthorDTO taskDto)
         {
@@ -54,6 +57,7 @@ namespace DataProj.API.Controllers
             return Ok(response.Data);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

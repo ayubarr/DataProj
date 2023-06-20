@@ -1,7 +1,9 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace DataProj.API.Controllers
 {
@@ -16,6 +18,7 @@ namespace DataProj.API.Controllers
             _projectService = projectService;
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] FilterProjectDTO projectFilterDto, [FromQuery] Sort? sortOrder)
         {
@@ -23,6 +26,7 @@ namespace DataProj.API.Controllers
             return Ok(response.Data);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -30,6 +34,7 @@ namespace DataProj.API.Controllers
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateProjectDTO createProjectDto)
         {
@@ -37,6 +42,7 @@ namespace DataProj.API.Controllers
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpPut("{projectid}")]
         public async Task<IActionResult> Update(Guid projectid, UpdateProjectDTO projectDto)
         {
@@ -44,6 +50,7 @@ namespace DataProj.API.Controllers
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

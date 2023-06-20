@@ -1,14 +1,15 @@
 ﻿using DataProj.ApiModels.Auth.Models;
 using DataProj.ApiModels.DTOs.EntitiesDTO.Employee;
-using DataProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
 using DataProj.Domain.Models.Entities;
 using DataProj.Domain.Models.Enums;
 using DataProj.Services.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using System.Threading.Tasks;
+using FinalProj.ApiModels.DTOs.EntitiesDTO.Employee;
 using FinalProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DataProj.API.Controllers
 {
@@ -26,14 +27,29 @@ namespace DataProj.API.Controllers
         }
 
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var response = await _employeeService.GetAllAsync();
-            return Ok(response.Data);
+
+
+            var employeeDtos = response.Data.Select(employee => new EmployeeDTO
+            {
+                Id = employee.Id,
+                UserName = employee.UserName,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                MiddleName = employee.MiddleName,
+                Email = employee.Email,
+                UserType = employee.UserType
+            });
+
+            return Ok(employeeDtos);
         }
 
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -41,6 +57,7 @@ namespace DataProj.API.Controllers
             return Ok(response.Data);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager, Employee")]
         [HttpGet]
         [Route("get-projects/{employeeId}")]
         public async Task<IActionResult> GetProjects(string employeeId)
@@ -49,9 +66,10 @@ namespace DataProj.API.Controllers
             return Ok(response.Data);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager, Employee")]
         [HttpGet]
         [Route("get-tasks/{employeeId}")]
-        public async Task<IActionResult> GetTasks( string employeeId)
+        public async Task<IActionResult> GetTasks(string employeeId)
         {
             var response = await _employeeService.GetEmployeeTasksAsync(employeeId);
 
@@ -65,15 +83,7 @@ namespace DataProj.API.Controllers
                 AuthorId = task.AuthorId,
                 ExecutorId = task.ExecutorId
             });
-
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                IgnoreNullValues = true,
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-
-            var tasksJson = JsonSerializer.Serialize(taskDtos, options);
+            var tasksJson = JsonSerializer.Serialize(taskDtos);
 
 
             return Content(tasksJson, "application/json");
@@ -81,6 +91,7 @@ namespace DataProj.API.Controllers
 
 
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(string id, UpdateEmployeeDTO employeeDto)
         {
@@ -89,6 +100,7 @@ namespace DataProj.API.Controllers
         }
 
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpGet("checkUserRole/{userId}/{roleType}")]
         public async Task<IActionResult> CheckUserRole(string userId, Roles roleType)
         {
@@ -104,6 +116,7 @@ namespace DataProj.API.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpPut]
         [Route("put-role/{userId}/{roleType}")]
         public async Task<IActionResult> PutRoleById(string userId, Roles roleType)
@@ -113,6 +126,7 @@ namespace DataProj.API.Controllers
         }
 
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -121,15 +135,17 @@ namespace DataProj.API.Controllers
         }
 
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager")]
         [HttpPost]
         [Route("assign-to-project/{projectId}")]
-        public async Task<IActionResult> Assign(List<string> employeesId, Guid projectId)
+        public async Task<IActionResult> AssignToProject(List<string> employeesId, Guid projectId)
         {
             var response = await _employeeService.AssignEmployeeToProjectAsync(employeesId, projectId);
             return Ok(response);
         }
 
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager")]
         [HttpPost]
         [Route("remove-from-project/{projectId}")]
         public async Task<IActionResult> RemoveFromProject(List<string> employeesId, Guid projectId)
@@ -139,6 +155,7 @@ namespace DataProj.API.Controllers
         }
 
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager")]
         [HttpPost]
         [Route("assign-executor-to-task/{taskId}/{employeeId}")]
         public async Task<IActionResult> AssignExecutorToTask(Guid taskId, string employeeId)
@@ -147,6 +164,7 @@ namespace DataProj.API.Controllers
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor, Manager, Employee")]
         [HttpPut]
         [Route("change-task-status/{taskId}/{newStatus}")]
         public async Task<IActionResult> ChangeTaskStatus(Guid taskId, Status newStatus)
@@ -179,6 +197,7 @@ namespace DataProj.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpPost]
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
@@ -187,6 +206,7 @@ namespace DataProj.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpPost]
         [Route("revoke/{username}")]
         public async Task<IActionResult> Revoke(string username)
@@ -202,6 +222,7 @@ namespace DataProj.API.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, Supervisor")]
         [HttpPost]
         [Route("revoke-all")]
         public async Task<IActionResult> RevokeAll()
