@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataProj.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class NullableMigration : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,6 +55,25 @@ namespace DataProj.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Logs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LogLevel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ThreadId = table.Column<int>(type: "int", nullable: true),
+                    EventId = table.Column<int>(type: "int", nullable: true),
+                    EventName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExceptionMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExceptionStackTrace = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExceptionSource = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Logs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -174,7 +193,7 @@ namespace DataProj.DAL.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false),
-                    ProjectManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ProjectManagerId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -315,6 +334,9 @@ namespace DataProj.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Logs");
 
             migrationBuilder.DropTable(
                 name: "ProjectEmployees");

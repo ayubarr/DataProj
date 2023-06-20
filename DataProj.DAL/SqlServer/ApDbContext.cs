@@ -1,6 +1,7 @@
 ﻿using DataProj.DAL.SqlServer.Configuration;
 using DataProj.Domain.Models.Abstractions.BaseUsers;
 using DataProj.Domain.Models.Entities;
+using DataProj.Domain.Models.Logs;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ namespace DataProj.DAL.SqlServer
         public DbSet<Employee> Employees { get; set; }
         public DbSet<ProjectEmployee> ProjectEmployees { get; set; }
         public DbSet<TaskItem> ProjectTasks { get; set; }
+        public DbSet<Log> Logs { get; set; }
 
         public AppDbContext() : base()
         {

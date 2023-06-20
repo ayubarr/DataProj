@@ -130,6 +130,7 @@ namespace DataProj.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ProjectManagerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("StartDate")
@@ -192,6 +193,42 @@ namespace DataProj.DAL.Migrations
                     b.HasIndex("ExecutorId");
 
                     b.ToTable("ProjectTasks");
+                });
+
+            modelBuilder.Entity("DataProj.Domain.Models.Logs.Log", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EventName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExceptionMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExceptionSource")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExceptionStackTrace")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LogLevel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ThreadId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Logs");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -357,7 +394,8 @@ namespace DataProj.DAL.Migrations
                     b.HasOne("DataProj.Domain.Models.Entities.Employee", "ProjectManager")
                         .WithMany()
                         .HasForeignKey("ProjectManagerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("ProjectManager");
                 });
