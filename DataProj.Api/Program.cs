@@ -19,11 +19,11 @@ builder.Services
     .InitializeServices();
 
 await builder.Services.InitializeRoles();
-//await builder.Services.SeedAdmins();
-//builder.Logging.IntialiseLogger(options =>
-//{
-//    builder.Configuration.GetSection("Logging").GetSection("Database").GetSection("Options").Bind(options);
-//});
+await builder.Services.SeedAdmins();
+builder.Logging.IntialiseLogger(options =>
+{
+    builder.Configuration.GetSection("Logging").GetSection("Database").GetSection("Options").Bind(options);
+});
 
 builder.Services.AddControllers();
 

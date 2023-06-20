@@ -1,4 +1,5 @@
-﻿using DataProj.DAL.Repository.Implemintations;
+﻿using DataProj.Api.Logs;
+using DataProj.DAL.Repository.Implemintations;
 using DataProj.DAL.Repository.Interfaces;
 using DataProj.DAL.SqlServer;
 using DataProj.Domain.Models.Abstractions.BaseUsers;
@@ -99,6 +100,43 @@ namespace DataProj.API
                     await roleManager.CreateAsync(new IdentityRole(roleName));
                 }
             }
+        }
+
+        public async static Task SeedAdmins(this IServiceCollection services)
+        {
+            var userManager = services.BuildServiceProvider().GetRequiredService<UserManager<Employee>>();
+            const string adminId = "1fd2c92f-1722-4b69-87db-f877b2656307";
+            const string adminName = "Ayub";
+
+            var user = await userManager.FindByIdAsync(adminId);
+
+            if (user != null) return;
+
+            var admin = new Employee()
+            {
+                Id = adminId,
+                FirstName = "Admin",
+                LastName = "Admin",
+                MiddleName = "Admin",             
+                Email = "admin@admin.com",
+                UserName = adminName,
+                NormalizedUserName = "Ayub".Normalize(),
+                NormalizedEmail = "admin@admin.com".Normalize(),
+            };
+
+            var passwordHasher = new PasswordHasher<ApplicationUser>();
+            admin.PasswordHash = passwordHasher.HashPassword(admin, "P@ssw0rd!");
+
+
+            await userManager.CreateAsync(admin);
+            await userManager.AddToRoleAsync(admin, Roles.Admin.ToString());
+        }
+
+
+        public static void IntialiseLogger(this ILoggingBuilder loggingBuilder, Action<DbLoggerOptions> configure)
+        {
+            loggingBuilder.Services.AddSingleton<ILoggerProvider, DbLoggerProvider>();
+            loggingBuilder.Services.Configure(configure);
         }
 
     }
