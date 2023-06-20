@@ -37,7 +37,7 @@ namespace DataProj.API.Controllers
         }
 
         [HttpGet]
-        [Route("get-projects/{id}")]
+        [Route("get-projects/{employeeId}")]
         public async Task<IActionResult> GetProjects(string employeeId)
         {
             var response = await _employeeService.GetEmployeeProjectsAsync(employeeId);
@@ -45,7 +45,7 @@ namespace DataProj.API.Controllers
         }
 
         [HttpGet]
-        [Route("get-projects-tasks/{id}")]
+        [Route("get-projects-tasks/{employeeId}")]
         public async Task<IActionResult> GetTasks(string employeeId)
         {
             var response = await _employeeService.GetProjectTasksAsync(employeeId);

@@ -10,21 +10,22 @@ using DataProj.Services.Services.Interfaces;
 using DataProj.ValidationHelper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace DataProj.Services.Services.Implementations
 {
     public class EmployeeService : IEmployeeService
     {
         private readonly UserManager<Employee> _userManager;
-        private readonly IBaseAsyncRepository<Project> _repository;
-        private readonly IBaseAsyncRepository<TaskItem> _taskItemRepository;
+        private readonly IProjectRepository _projectRepository;
+        private readonly ITaskItemRepository _taskItemRepository;
 
         public EmployeeService(UserManager<Employee> userManager,
-            IBaseAsyncRepository<Project> repository,
-            IBaseAsyncRepository<TaskItem> taskItemRepository)
+            IProjectRepository repository,
+            ITaskItemRepository taskItemRepository)
         {
             _userManager = userManager;
-            _repository = repository;
+            _projectRepository = repository;
             _taskItemRepository = taskItemRepository;
         }
 
@@ -139,10 +140,10 @@ namespace DataProj.Services.Services.Implementations
                     ObjectValidator<Employee>.CheckIsNotNullObject(employee);
                 }
      
-                var project = await _repository.ReadByIdAsync(projectId);
+                var project = await _projectRepository.ReadByIdAsync(projectId);
                 project.Employees = employeesId.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList();
 
-                await _repository.UpdateAsync(project);
+                await _projectRepository.UpdateAsync(project);
 
                 return ResponseFactory<bool>.CreateSuccessResponse(true);
             }
@@ -156,7 +157,6 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-        //TODO: FIX
         public async Task<IBaseResponse<bool>> RemoveEmployeeFromProjectAsync(List<string> employeesId, Guid projectId)
         {
             try
@@ -171,21 +171,16 @@ namespace DataProj.Services.Services.Implementations
                     ObjectValidator<Employee>.CheckIsNotNullObject(employee);
                 }
 
-                var project = await _repository.ReadByIdAsync(projectId);
+                var project = await _projectRepository.GetFilteredProjectByIdAsync(projectId);
+                    
+                var projectEmployeesToRemove = project.Employees.Where(pe => employeesId.Contains(pe.EmployeeId)).ToList();
 
-                var projectEmployee = employeesId.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList();
-                //var projectEmployee = project.Employees.FirstOrDefault(pe => pe.EmployeeId == employeeId);
-                if (projectEmployee != null)
+                foreach (var projectEmployee in projectEmployeesToRemove)
                 {
-                    foreach (var emp in projectEmployee)
-                    {
-                        project.Employees.Remove(emp);
-                    }
-                    await _repository.UpdateAsync(project);
+                    project.Employees.Remove(projectEmployee);
                 }
-
-                await _repository.UpdateAsync(project);
-
+          
+                await _projectRepository.UpdateAsync(project);
 
                 return ResponseFactory<bool>.CreateSuccessResponse(true);
             }
@@ -201,6 +196,7 @@ namespace DataProj.Services.Services.Implementations
 
         public async Task<IBaseResponse<bool>> AssignExecutorToTaskAsync(Guid taskId, string employeeId)
         {
+        
             try
             {
                 ObjectValidator<Guid>.CheckIsNotNullObject(taskId);
@@ -209,7 +205,7 @@ namespace DataProj.Services.Services.Implementations
                 var employee = await _userManager.FindByIdAsync(employeeId);
                 ObjectValidator<Employee>.CheckIsNotNullObject(employee);
 
-                var taskItem = await _taskItemRepository.ReadByIdAsync(taskId);
+                var taskItem = await _taskItemRepository.GetFilteredTaskItemByIdAsync(taskId);
 
                 taskItem.Executor = employee;
 
@@ -261,7 +257,7 @@ namespace DataProj.Services.Services.Implementations
                 var employee = await _userManager.FindByIdAsync(employeeId);
                 ObjectValidator<Employee>.CheckIsNotNullObject(employee);
 
-                var projects = await _repository.ReadAllAsync().Result
+                var projects = await _projectRepository.ReadAllAsync().Result
                     .Where(p => p.Employees
                     .Any(pe => pe.EmployeeId == employeeId))
                     .ToListAsync();
@@ -280,6 +276,7 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
+        //TO DO: FIx
         public async Task<IBaseResponse<IEnumerable<TaskItem>>> GetProjectTasksAsync(string employeeId)
         {
             try
@@ -287,6 +284,8 @@ namespace DataProj.Services.Services.Implementations
                 StringValidator.CheckIsNotNull(employeeId);
 
                 var manager = await _userManager.FindByIdAsync(employeeId);
+
+                
 
                 var tasks = manager.ExecutorTasks;
 

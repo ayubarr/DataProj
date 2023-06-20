@@ -27,6 +27,7 @@ namespace DataProj.Services.Services.Implementations
         {
             try
             {
+                ObjectValidator<CreateProjectDTO>.CheckIsNotNullObject(createProjectDto);
                 var project = new Project
                 {
                     Name = createProjectDto.Name,
@@ -35,13 +36,13 @@ namespace DataProj.Services.Services.Implementations
                     EndDate = createProjectDto.EndDate,
                     ClientCompanyName = createProjectDto.ClientCompanyName,
                     ExecutiveCompanyName = createProjectDto.ExecutiveCompanyName,
-                    ProjectManagerId = createProjectDto.ProjectManagerId,
-                   // Employees = createProjectDto.EmployeesIds.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList()
                 };
 
-                var projectManager = await _userManager.FindByIdAsync(createProjectDto.ProjectManagerId);
+                if (await _userManager.FindByIdAsync(createProjectDto.ProjectManagerId) == null)
+                    throw new ArgumentNullException($"Employee with id  {createProjectDto.ProjectManagerId} not found");
+
+                project.ProjectManagerId = createProjectDto.ProjectManagerId;
                 var employees = createProjectDto.EmployeesIds.Select(x => new ProjectEmployee { EmployeeId = x.ToString() }).ToList();
-                project.ProjectManager = projectManager;
                 project.Employees = employees;
 
                 await _projectRepository.Create(project);

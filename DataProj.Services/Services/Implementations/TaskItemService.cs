@@ -8,16 +8,19 @@ using DataProj.Services.Helpers;
 using DataProj.Services.Services.Interfaces;
 using DataProj.ValidationHelper;
 using FinalProj.ApiModels.DTOs.EntitiesDTO.TaskItem;
+using Microsoft.AspNetCore.Identity;
 
 namespace DataProj.Services.Services.Implementations
 {
     public class TaskItemService : ITaskItemService
     {
         private readonly ITaskItemRepository _taskItemRepository;
+        private readonly UserManager<Employee> _userManager;
 
-        public TaskItemService(ITaskItemRepository taskItemRepository)
+        public TaskItemService(ITaskItemRepository taskItemRepository, UserManager<Employee> userManager)
         {
             _taskItemRepository = taskItemRepository;
+            _userManager = userManager;
         }
 
         public async Task<IBaseResponse<Guid>> CreateAsync(CreateTaskItemDTO createTaskItemDto)
@@ -30,9 +33,15 @@ namespace DataProj.Services.Services.Implementations
                     Comment = createTaskItemDto.Comment,
                     Status = createTaskItemDto.Status,
                     Priority = createTaskItemDto.Priority,
-                    AuthorId = createTaskItemDto.AuthorId,
-                    ExecutorId = createTaskItemDto.ExecutorId
                 };
+
+
+                if (await _userManager.FindByIdAsync(createTaskItemDto.AuthorId) != null)
+                    taskItem.AuthorId = createTaskItemDto.AuthorId;
+
+                if (await _userManager.FindByIdAsync(createTaskItemDto.ExecutorId) != null)
+                    taskItem.ExecutorId = createTaskItemDto.ExecutorId;
+
 
                 await _taskItemRepository.Create(taskItem);
 
