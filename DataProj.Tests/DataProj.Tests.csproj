@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataProj.DAL\DataProj.DAL.csproj" />
+    <ProjectReference Include="..\DataProj.Services\DataProj.Services.csproj" />
   </ItemGroup>
 
 </Project>

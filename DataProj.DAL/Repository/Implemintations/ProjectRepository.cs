@@ -1,6 +1,7 @@
 ﻿using DataProj.DAL.Repository.Interfaces;
 using DataProj.DAL.SqlServer;
 using DataProj.Domain.Models.Entities;
+using DataProj.ValidationHelper;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -14,7 +15,11 @@ namespace DataProj.DAL.Repository.Implemintations
 
         public async Task<IEnumerable<Project>> GetFilteredProjectAsync(Expression<Func<Project, bool>> filter)
         {
-            return await ReadAll().Where(filter).ToListAsync();
+            ObjectValidator<Expression<Func<Project, bool>>>.CheckIsNotNullObject(filter);
+
+            return await ReadAll()
+                .Where(filter)
+                .ToListAsync();
 
         }
 
