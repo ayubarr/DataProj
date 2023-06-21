@@ -1,5 +1,4 @@
 ﻿using DataProj.ApiModels.DTOs.EntitiesDTO.Project;
-using DataProj.ApiModels.Response.Implemintations;
 using DataProj.ApiModels.Response.Interfaces;
 using DataProj.DAL.Repository.Interfaces;
 using DataProj.Domain.Models.Entities;
@@ -103,7 +102,6 @@ namespace DataProj.Tests.Services
             // Arrange
             var projectFilterDto = new FilterProjectDTO
             {
-                // Set the filter properties as needed
             };
 
             var projects = new List<Project>
