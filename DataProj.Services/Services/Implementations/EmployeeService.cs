@@ -244,7 +244,6 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-
         public async Task<IBaseResponse<IEnumerable<Project>>> GetEmployeeProjectsAsync(string employeeId)
         {
             try
@@ -270,7 +269,6 @@ namespace DataProj.Services.Services.Implementations
             }
         }
 
-        //TO DO: FIx
         public async Task<IBaseResponse<IEnumerable<TaskItem>>> GetEmployeeTasksAsync(string employeeId)
         {
             try
@@ -349,12 +347,6 @@ namespace DataProj.Services.Services.Implementations
                 };
 
                 await _userManager.RemoveFromRolesAsync(employee, roles);
-                //await _userManager.RemoveFromRoleAsync(employee, Roles.Employee.ToString());
-                //await _userManager.RemoveFromRoleAsync(employee, Roles.Manager.ToString());
-                //await _userManager.RemoveFromRoleAsync(employee, Roles.Admin.ToString());
-                //await _userManager.RemoveFromRoleAsync(employee, Roles.Supervisor.ToString());
-
-
 
                 var result = await _userManager.AddToRoleAsync(employee, roleType.ToString());
 
